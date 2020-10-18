@@ -1,147 +1,101 @@
-#!/usr/bin/python
-#-*-coding:utf8-*-
+// code de cesar
 
-import sys
-import os
+#include <stdio.h>
+#include <stdlib.h>
 
-""" 
-    Décale de n place(s) dans la table ASCII
-"""
-def letterShift(letter, n):
-    return chr((ord(letter) + n) % 255)
-        
-""" 
-    Crypte un texte 
-"""        
-def encryptText(text, n):
-    encryptText = ""
-    
-    for i in range(0, len(text)):
-        character = text[i]
-        
-        if character != " ":
-            encryptText = encryptText + letterShift(character, n)
-        else:
-            encryptText = encryptText + " "
-    
-    return encryptText
+// flush
+void flush()
+{
+	while( getchar() != '\n' )
+		continue;
+}
 
-
-""" 
-    Décrypte un texte 
-"""
-def decryptText(text, n):
-    decryptText = ""
-    
-    for i in range(0, len(text)):
-        character = text[i]
-
-        if character != " ":
-            decryptText = decryptText + letterShift(character, int("-" + str(n)))
-        else:
-            decryptText = decryptText + " "
-            
-    return decryptText
-
-
-""" 
-    Crypte un texte avec une clé saisie par l'utilisateur 
-"""
-def encryptTextKey(text, key):
-    encryptText = "" 
-    
-    for i in range(0, len(text)):
-        character = text[i]
-        
-        if character != " ":
-            encryptText = encryptText + letterShift(character, int(key[i % len(key)]))
-        else:
-            encryptText = encryptText + " "
-    
-    return encryptText
-
-
-""" 
-    Décrypte le texte avec la clé saisie par l'utilisateur 
-"""    
-def decryptTextKey(text, key):
-    decryptText = ''
-    
-    for i in range(0, len(text)):
-        character = text[i]
-        
-        if character != " ":
-            decryptText = decryptText + letterShift(character, int("-" + str(key[i % len(key)])))
-        else:
-            decryptText = decryptText + " "
-    
-    return decryptText
-"""
-    Crypte le contenu d'un fichier texte
-"""
-def encryptFile(file, key):
-    file = open(file, 'r')
-    text = file.read()
-    file.close()
-    encryptFile = encryptTextKey(text, key)
-    file = open('texte_crypte', 'w')
-    file.write(encryptFile)
-    file.close()
-   
-
-"""
-    Décrypte le contenu d'un fichier
-"""
-def decryptFile(file, key):
-    file = open(file, 'r')
-    encryptText = file.read()
-    file.close()
-    decryptText = decryptTextKey(encryptText, key)
-    file = open('texte_decrypte', 'w')
-    file.write(decryptText)
-    file.close()
-
-
-"""
-    Fonction main 
-"""
-if __name__ == '__main__':
-    print " 1 -> Code de cesar"
-    print " 2 -> Code de cesar amelioré"
-    print " 3 -> Crypter un fichier"
-    print " 4 -> Décrypter un fichier"
-    choice = raw_input("Choix : ")
-    print
-    
-    if choice == str("1"):
-        print "======= DONNEES ======="
-        shift = raw_input("Entrez le décalage souhaité : ")
-        text = raw_input("Entrez le texte à crypter : ")
-        print "======= CRYPTAGE ======="
-        encryptText = encryptText(text, int(shift))
-        print "Texte crypté : ", encryptText
-        print "======= DECRYPTAGE ======="
-        decryptText = decryptText(encryptText, int(shift))
-        print "Texte décrypté : ", decryptText
-    
-    if choice == str("2"):
-        print "======= DONNEES ======="
-        key = raw_input("Entrez la clé de chiffrement : ")
-        text = raw_input("Entrez le texte à crypter : ")
-        print "======= CRYPTAGE ======="
-        encryptText = encryptTextKey(text, key)
-        print "Texte crypté : ", encryptText
-        print "======= DECRYPTAGE ======="
-        decryptText = decryptTextKey(encryptText, key)
-        print "Texte décrypté : ", decryptText
-    
-    if choice == str("3"):
-        print "======= DONNEES ======="
-        key = raw_input("Entrer la clé de chiffrement de votre fichier : ")
-        file = sys.argv[1]
-        encryptFile(file, key)
-        decryptFile("texte_crypte", key)
-        print "=> CRYPTAGE ET DECRYPTAGE TERMINE"
-
-    print
-    sys.exit(0)
+// programme principal
+int main()
+{
+	int decalage = 0;
+	char nom_fichier[256];
+	char choix = 'c';
+	// choix
+	printf( "Code de Cesar\n" );
+	printf( "\nSaisir le décalage : " );
+	scanf( "%d", &decalage );
+	flush();
+	printf( "\nSaisir le nom du fichier : " );
+	scanf( "%s", nom_fichier );
+	flush();
+	printf( "\nChiffrement [c] ou déchiffrement [d] : " );
+	scanf( "%c", &choix );
+	// synthèse
+	switch( choix )
+	{
+	case 'c' :
+		printf("\nVous avez demandé le chiffrement du fichier %s avec un décalage de %d.\n", nom_fichier, decalage );
+		{
+			int index;
+			int taille_fichier = 0;
+			FILE * fichier_avant = NULL;
+			FILE * fichier_apres = NULL;
+			int taille_memoire_tamon = 1024;
+			char * memoire_tampon = NULL;
+			// allocation
+			memoire_tampon = (char*)malloc(taille_memoire_tamon);
+			// mise en mémoire tampon
+			fichier_avant = fopen( nom_fichier, "r" );
+			taille_fichier = fread( memoire_tampon, 1, taille_memoire_tamon, fichier_avant );
+			fclose( fichier_avant );
+			// chiffrement dans le mémoire tampon
+			for( index = 0; index != taille_fichier; ++index )
+			{
+				// chiffrement des majuscules
+				if( memoire_tampon[ index ] >=65 && memoire_tampon[ index ] < 91 )
+					memoire_tampon[ index ] = ( ( memoire_tampon[ index ] - 65 ) + decalage ) % 26 + 65;
+				// chiffrement des minuscules
+				if( memoire_tampon[ index ] >=97 && memoire_tampon[ index ] < 123 )
+					memoire_tampon[ index ] = ( ( memoire_tampon[ index ] - 97 ) + decalage ) % 26 + 97;
+			}
+			// mise a jour du fichier
+			fichier_apres = fopen( nom_fichier, "w" );
+			fwrite( memoire_tampon, 1, taille_fichier, fichier_apres );
+			fclose( fichier_apres );
+			// desallocation
+			free( memoire_tampon);
+		}
+		return 0;
+	case 'd' :
+		printf("\nVous avez demandé le déchiffrement du fichier %s avec un décalage de %d.\n", nom_fichier, decalage );
+		{
+			int index;
+			int taille_fichier = 0;
+			FILE * fichier_avant = NULL;
+			FILE * fichier_apres = NULL;
+			int taille_memoire_tamon = 1024;
+			char * memoire_tampon = NULL;
+			// allocation
+			memoire_tampon = (char*)malloc(taille_memoire_tamon);
+			// mise en mémoire tampon
+			fichier_avant = fopen( nom_fichier, "r" );
+			taille_fichier = fread( memoire_tampon, 1, taille_memoire_tamon, fichier_avant );
+			fclose( fichier_avant );
+			// déchiffrement dans le mémoire tampon
+			for( index = 0; index != taille_fichier; ++index )
+			{
+				// déchiffrement des majuscules
+				if( memoire_tampon[ index ] >=65 && memoire_tampon[ index ] < 91 )
+					memoire_tampon[ index ] = ( ( memoire_tampon[ index ] - 65 ) - decalage ) % 26 + 65;
+				// déchiffrement des minuscules
+				if( memoire_tampon[ index ] >=97 && memoire_tampon[ index ] < 123 )
+					memoire_tampon[ index ] = ( ( memoire_tampon[ index ] - 97 ) - decalage ) % 26 + 97;
+			}
+			// mise a jour du fichier
+			fichier_apres = fopen( nom_fichier, "w" );
+			fwrite( memoire_tampon, 1, taille_fichier, fichier_apres );
+			fclose( fichier_apres );
+			// desallocation
+			free( memoire_tampon);
+		}
+		return 0;
+	default:
+		return -1;
+	}
+}
